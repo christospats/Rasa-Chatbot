@@ -1,0 +1,28 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-cost",
+      "2": "I-cost",
+      "3": "L-cost",
+      "4": "U-cost",
+      "5": "B-file",
+      "6": "I-file",
+      "7": "L-file",
+      "8": "U-file",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-cost": 1,
+      "I-cost": 2,
+      "L-cost": 3,
+      "U-cost": 4,
+      "B-file": 5,
+      "I-file": 6,
+      "L-file": 7,
+      "U-file": 8,
+      "O": 0
+    },
+    "num_tags": 9
+  }
+]
