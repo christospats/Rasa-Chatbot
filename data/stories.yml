@@ -1,0 +1,69 @@
+version: "3.1"
+
+stories:
+
+# Normal paths
+
+- story: first path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: files
+  - action: utter_files
+  - intent: presumptions
+  - action: utter_presumptions
+  - intent: costs
+  - action: utter_buttons
+  - intent: goodbye
+  - action: utter_goodbye
+
+
+- story: only costs
+  steps:
+  - intent: costs
+  - action: utter_buttons
+
+- story: only presumptions
+  steps:
+  - intent: presumptions
+  - action: utter_presumptions
+
+- story: only files
+  steps:
+  - intent: files
+  - action: utter_files
+
+- story: find_file
+  steps:
+  - intent: find_the_files
+  - action: action_find_and_show_file
+
+- story: TEE
+  steps:
+  - intent: TEE
+  - action: utter_TEE
+
+- story: parabolo
+  steps:
+  - intent: parabolo
+  - action: utter_parabolo
+
+- story: Telh
+  steps:
+  - intent: Telh
+  - action: utter_Telh
+
+- story: sundromh
+  steps:
+  - intent: sundromh
+  - action: utter_sundromh
+
+- story: xartoshmo
+  steps:
+  - intent: xartoshmo
+  - action: utter_xartoshmo
+
+- story: sunoliko
+  steps:
+  - intent: sunoliko
+  - action: utter_costs
