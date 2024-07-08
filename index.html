@@ -1,0 +1,187 @@
+<!-- Για να τρεχει ο server rasa run -m models --enable-api --cors “*” -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasa Chatbot</title>
+    <!-- Styles for my interface -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            gap: 20px;
+        }
+        header {
+            width: 100%;
+            background-color: #003375;
+            color: white;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+        #chat-container {
+            width: 100%;
+            max-width: 1500px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #chat-box {
+            height: 400px;
+            overflow-y: scroll;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        #user-input {
+            display: flex;
+            padding: 10px;
+        }
+        #user-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #user-input button {
+            padding: 10px;
+            border: none;
+            background: #003375;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- html code for the interface -->
+    <header>Rasa Chatbot</header>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <div id="user-input">
+            <input type="text" id="user-message" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatBox = document.getElementById('chat-box');
+            const userMessageInput = document.getElementById('user-message');
+
+            // Append message
+            function appendMessage(sender, message) {
+                const messageElement = document.createElement('div');
+                messageElement.innerHTML = `${sender}: ${message}`;
+                messageElement.style.padding = '10px';
+                messageElement.style.borderBottom = '1px solid #ddd';
+                // Its an if condition (if sender = user then right else left) 
+                messageElement.style.textAlign = sender === 'User' ? 'right' : 'left';
+                messageElement.style.color = sender === 'User' ? '#003375' : '#333';
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            // Create buttons for bot responses
+            function createButtons(buttons) {
+                buttons.forEach(button => {
+                    const buttonElement = document.createElement('button');
+                    buttonElement.textContent = button.title;
+                    Object.assign(buttonElement.style, {
+                        padding: '10px',
+                        border: 'none',
+                        background: '#003375',
+                        color: 'white',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        margin: '10px 0 0 10px'
+                    });
+                    buttonElement.addEventListener('click', () => handleButtonClick(button.title));
+                    chatBox.appendChild(buttonElement);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            // Handle button click events
+            async function handleButtonClick(buttonText) {
+                await sendRequest(buttonText);
+            }
+
+            // Send request to bot
+            async function sendRequest(message, isUserMessage = true) {
+                if (isUserMessage) {
+                    appendMessage('User', message);
+                }
+                userMessageInput.value = '';
+
+                try {
+                    const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                    const data = await response.json();
+
+                    if (data && data.length > 0) {
+                        const combinedMessage = data.map(msg => msg.text).join('<br>');
+                        appendMessage('Bot', combinedMessage);
+
+                        // Check for and create buttons
+                        data.forEach(msg => {
+                            if (msg.buttons && msg.buttons.length > 0) {
+                                createButtons(msg.buttons);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Initial message on page load
+            async function requestInitialMessage() {
+                try {
+                    const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: "/greet" })
+                    });
+                    const data = await response.json();
+
+                    if (data && data.length > 0) {
+                        const combinedMessage = data.map(msg => msg.text).join('<br>');
+                        appendMessage('Bot', combinedMessage);
+
+                        // Check for and create buttons if present
+                        data.forEach(msg => {
+                            if (msg.buttons && msg.buttons.length > 0) {
+                                createButtons(msg.buttons);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // Event listener for Enter key press
+            userMessageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendRequest(userMessageInput.value.trim());
+                }
+            });
+
+            // Initialize chat by requesting initial message from bot
+            requestInitialMessage();
+        });
+    </script>
+</body>
+</html>
