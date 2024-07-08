@@ -191,3 +191,15 @@ The sendRequest function sends a POST request to http://localhost:5005/webhooks/
 requestInitialMessage is the function I use to initiate the chatbot's greeting to the user. Ensure to replace "/greet" with the desired intent to start the conversation, such as "/goodbye" or "/files".
 
 The rest of the code should remain as is.
+
+Final step: Go to your command prompt (cmd) and navigate to your Rasa directory. Run the following command:
+
+```cmd
+rasa run -m models --enable-api --cors "*"
+```
+Wait until you see the message "Rasa server is up and running". Then, double-click your HTML file to open it in your preferred browser. Your setup should be ready.
+
+If your Rasa project includes custom actions, you'll need to run:
+```cmd
+rasa run actions
+```
